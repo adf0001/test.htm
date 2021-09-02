@@ -6,15 +6,21 @@ var sample= ( typeof module==="object" && module.exports ) ? require("../sample.
 testData={		//global variable
 	
 	"test 1": function(done){
-		done(!sample.funcTrue());
+		return sample.funcTrue();
 	},
 	"test 2": function(done){
-		done(!sample.funcFalse());
+		return sample.funcFalse();
 	},
 	"test 3": function(done){
-		setTimeout( function(){ done(!sample.funcTrue())},1000 );
+		done(!sample.funcTrue());
 	},
 	"test 4": function(done){
+		done(!sample.funcFalse());
+	},
+	"test 5": function(done){
+		setTimeout( function(){ done(!sample.funcTrue())},1000 );
+	},
+	"test 6": function(done){
 		setTimeout( function(){ done(!sample.funcFalse())},1000 );
 	},
 };

@@ -56,6 +56,7 @@ function runItem( func ){
 	try{
 		var name= ele('inpName').value;
 		var ret= func ? func( function(ret){doneCallback(ret,name)} ) : eval(ele('txtCode').value);
+		if( ret ) setOk(name);
 	}
 	catch(ex){
 		console.log(ex);
@@ -63,8 +64,6 @@ function runItem( func ){
 		return;
 	}
 	ele('divResult').innerHTML= dateString19(new Date()).slice(-8) + " / " + ele('inpName').value + "<br>" + ret;
-	
-	return ret;
 }
 
 function onClickItem(evt){
@@ -82,7 +81,7 @@ function onClickItem(evt){
 	ele('divResult').innerHTML=  ele('divResult2').innerHTML=  ele('divResult3').innerHTML= "";
 	if( !sCode ) return;
 	
-	if( runItem( ( typeof item==="function" ) ? item : null ) ) setOk(name);	//run function at the 1st time, to enable inline debugger.
+	runItem( ( typeof item==="function" ) ? item : null );	//run function at the 1st time, to enable inline debugger.
 }
 
 function onBodyLoad(){
