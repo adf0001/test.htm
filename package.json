@@ -1,0 +1,22 @@
+{
+  "name": "test.htm",
+  "version": "1.0.0",
+  "description": "test htm template",
+  "main": "test/test.htm",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/adf0001/test.htm.git"
+  },
+  "author": "fwg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/adf0001/test.htm/issues"
+  },
+  "homepage": "https://github.com/adf0001/test.htm#readme"
+}
