@@ -74,7 +74,7 @@ function onClickItem(evt){
 	ele('inpName').value= name;
 	
 	var item= testData[name], sCode;
-	if( typeof item==="function" ){ sCode= ("("+item+")(function(ret){doneCallback(ret,'"+name+"')})").replace(/\r/g,"").replace(/\n\t/g, "\n" ); }
+	if( typeof item==="function" ){ sCode= ("(\n\t"+item+"\n)(function(ret){doneCallback(ret,'"+name+"')})"); }
 	else{ sCode= item; }
 	ele('txtCode').value= sCode;
 	
