@@ -68,7 +68,7 @@ function runItem( func ){
 
 function onClickItem(evt){
 	var el= evt.target;
-	if( ! el.tagName=="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
+	if( el.tagName.toUpperCase()!="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
 	
 	var name= el.textContent;
 	ele('inpName').value= name;
@@ -84,8 +84,18 @@ function onClickItem(evt){
 	runItem( ( typeof item==="function" ) ? item : null );	//run function at the 1st time, to enable inline debugger.
 }
 
+function runAll(){
+	if( ! window.confirm("run all ?") ) return;
+	
+	for(var i in testData){
+		onClickItem( {target:ele('spCmdList').querySelector("span[name='"+i.replace(/\W/g,"-")+"']")} );
+	}
+}
+
 function onBodyLoad(){
-	ele('spCmdList').innerHTML=  Object.keys(testData).map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>");
+	var ks= Object.keys(testData);
+	ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
+		"<br><br><div style='font-size:9pt;font-weight:bold;'>count: <i class='ht-cmd' onclick='runAll()' title='run all'>"+ks.length+"</i></div>";
 }
 
 function setOk(name){
