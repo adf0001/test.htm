@@ -23,4 +23,13 @@ testData={		//global variable
 	"test 6": function(done){
 		setTimeout( function(){ done(!sample.funcFalse())},1000 );
 	},
+		
+	
+	/*
+	//code template
+	"": function(done){
+		return 
+
+	},
+	*/
 };
