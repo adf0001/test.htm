@@ -51,9 +51,15 @@ async function consolePrompt( questionText ){
 
 var replaceMode="";
 
-async function copyReplacedFile( fname, replacePairArray ){
+async function copyReplacedFile( fname, replacePairArray, protectUserFile ){
 	if( fs.existsSync( destDir + fname ) ){
+		if( protectUserFile ){
+			console.warn( fname + " ........................ skip existed and protected !!!" );
+			return;
+		}
+		
 		var inp= await consolePrompt( "File '" + fname+"' is already existed, replaced it ? y/n (n):");
+		
 		if( inp!="y" ){
 			console.warn( fname + " ........................ skip existed !!!" );
 			return true;
@@ -75,7 +81,7 @@ async function copyReplacedFile( fname, replacePairArray ){
 
 async function mainAsync(){
 	await copyReplacedFile( "test/test.htm", [] );
-	await copyReplacedFile( "test/test-data.js", [ /\"sample\"/g, "\""+name+"\"", "../sample.js", "../"+mainName, /sample/g, newRef ] );
+	await copyReplacedFile( "test/test-data.js", [ /\"sample\"/g, "\""+name+"\"", "../sample.js", "../"+mainName, /sample/g, newRef ], true );
 	
 	var inp= await consolePrompt('* For mocha? y/n (n):');
 	if( inp=="y" ){
