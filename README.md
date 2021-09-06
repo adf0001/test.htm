@@ -19,12 +19,14 @@ npm install test.htm --no-save
 	* optional, at first time usage, select 'y' to "Install global environment";
 		or double click to run './node_modules/test.htm/dev-0-0-install-global.bat';
 
-4. optional, package './node_modules/test.htm/' can be removed now, as you like.
+	* optional, package 'test.htm' can be removed now, as you like; 
+		select 'y' to "Remove/uninstall package 'test.htm'"; 
+		or execute manually
 ```
 npm uninstall test.htm --no-save
 ```
 
-5. now update file 'test/test-data.js' in your project with your code,
+4. now update file 'test/test-data.js' in your project with your code,
 	and open page 'test/test.htm' to test in browsers.
 
 
