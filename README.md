@@ -1,4 +1,4 @@
-# test.htm
+ï»¿# test.htm
 test htm template
 
 ## usage
@@ -25,28 +25,28 @@ test htm template
 ## file structure
 
 ```
-©À©¤package.json								//your package.json
-©¦  ©À©¤node_modules
-©¦  ©¦  ©À©¤test.htm
-©¦  ©¦  ©¦  ©¦  .gitignore
-©¦  ©¦  ©¦  ©¦  dev-0-0-install-global.bat		//initialize environment
-©¦  ©¦  ©¦  ©¦  dev-0-1-copy-files.bat			//initialize your project
-©¦  ©¦  ©¦  ©¦  dev-1-browserify-watchify.bat	//develop tool 1: watchify
-©¦  ©¦  ©¦  ©¦  dev-2-browserify-terser.bat		//develop tool 2: pack
-©¦  ©¦  ©¦  ©¦  package.json
-©¦  ©¦  ©¦  ©¦  README.md
-©¦  ©¦  ©¦  ©¦  sample.js
-©¦  ©¦  ©¦  ©¦
-©¦  ©¦  ©¦  ©À©¤release
-©¦  ©¦  ©¦  ©¦      bundle.js
-©¦  ©¦  ©¦  ©¦      bundle.min.js
-©¦  ©¦  ©¦  ©¦
-©¦  ©¦  ©¦  ©À©¤res
-©¦  ©¦  ©¦  ©¦      copy-files.js
-©¦  ©¦  ©¦  ©¦
-©¦  ©¦  ©¦  ©¸©¤test
-©¦  ©¦  ©¦          test-data.js		//user defined test data
-©¦  ©¦  ©¦          test.htm			//for browser
-©¦  ©¦  ©¦          test.bat			//for mocha
-©¦  ©¦  ©¦          test.js				//for mocha
+â”œâ”€package.json								//your package.json
+â”‚  â”œâ”€node_modules
+â”‚  â”‚  â”œâ”€test.htm
+â”‚  â”‚  â”‚  â”‚  .gitignore
+â”‚  â”‚  â”‚  â”‚  dev-0-0-install-global.bat		//initialize environment
+â”‚  â”‚  â”‚  â”‚  dev-0-1-copy-files.bat			//initialize your project
+â”‚  â”‚  â”‚  â”‚  dev-1-browserify-watchify.bat	//develop tool 1: watchify
+â”‚  â”‚  â”‚  â”‚  dev-2-browserify-terser.bat		//develop tool 2: pack
+â”‚  â”‚  â”‚  â”‚  package.json
+â”‚  â”‚  â”‚  â”‚  README.md
+â”‚  â”‚  â”‚  â”‚  sample.js
+â”‚  â”‚  â”‚  â”‚
+â”‚  â”‚  â”‚  â”œâ”€release
+â”‚  â”‚  â”‚  â”‚      bundle.js
+â”‚  â”‚  â”‚  â”‚      bundle.min.js
+â”‚  â”‚  â”‚  â”‚
+â”‚  â”‚  â”‚  â”œâ”€res
+â”‚  â”‚  â”‚  â”‚      copy-files.js
+â”‚  â”‚  â”‚  â”‚
+â”‚  â”‚  â”‚  â””â”€test
+â”‚  â”‚  â”‚          test-data.js		//user defined test data
+â”‚  â”‚  â”‚          test.htm			//for browser
+â”‚  â”‚  â”‚          test.bat			//for mocha
+â”‚  â”‚  â”‚          test.js				//for mocha
 ```
