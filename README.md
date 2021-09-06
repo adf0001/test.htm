@@ -7,7 +7,7 @@ test htm template
 
 2. install with no-save mode
 ```
-	npm install test.htm --no-save
+npm install test.htm --no-save
 ```
 
 3. double click to run './node_modules/test.htm/dev-0-1-copy-files.bat';
@@ -21,7 +21,7 @@ test htm template
 
 4. optional, package './node_modules/test.htm/' can be removed now, as you like.
 ```
-	npm uninstall test.htm --no-save
+npm uninstall test.htm --no-save
 ```
 
 5. now update file 'test/test-data.js' in your project with your code,
