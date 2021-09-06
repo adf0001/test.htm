@@ -1,4 +1,4 @@
 
-node ./copy-files.js
+node ./res/copy-files.js
 
 pause
