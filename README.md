@@ -2,7 +2,7 @@
 test htm template
 
 ## usage
-	1. prepare the file `package.json` of your project;
+	1. prepare the file 'package.json' of your project;
 	
 	2. install with no-save mode
 ```
@@ -21,7 +21,8 @@ test htm template
 ```
 		npm uninstall test.htm --no-save
 ```	
-	5. now update file 'test/test-data.js' in your project with your code, and open page 'test/test.htm' to test in browsers.
+	5. now update file 'test/test-data.js' in your project with your code,
+		and open page 'test/test.htm' to test in browsers.
 	
 	
 ## file structure
