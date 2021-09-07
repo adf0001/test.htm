@@ -1,5 +1,9 @@
 
-node ./res/copy-files.js
+set oldPath=%CD%
+
+cd /d "%~dp0"
+
+node res/copy-files.js
 
 @echo.
 @echo --------------------------------------------
@@ -12,5 +16,7 @@ node ./res/copy-files.js
 	npm uninstall test.htm --no-save
 	rd node_modules
 )
+
+cd /d "%oldPath%"
 
 pause

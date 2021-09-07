@@ -1,6 +1,6 @@
 {
   "name": "test.htm",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "test htm template",
   "main": "test/test.htm",
   "directories": {
