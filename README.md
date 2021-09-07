@@ -15,16 +15,16 @@ npm install test.htm --no-save
 ./node_modules/test.htm/dev-0-1-copy-files.bat
 ```
 
-	* optional, to copy mocha tools, select 'y' to "For mocha";
-	
-	* optional, to copy develope tools, select 'y' to "Copy develope tool";
-	
-	* optional, at first time usage, select 'y' to "Install global environment";
-		or double click to run './node_modules/test.htm/dev-0-0-install-global.bat';
+* optional, to copy mocha tools, select 'y' to "For mocha";
 
-	* optional, package 'test.htm' can be removed now, as you like; 
-		select 'y' to "Remove/uninstall package 'test.htm'"; 
-		or execute manually
+* optional, to copy develope tools, select 'y' to "Copy develope tool";
+
+* optional, at first time usage, select 'y' to "Install global environment";
+	or double click to run './node_modules/test.htm/dev-0-0-install-global.bat';
+
+* optional, package 'test.htm' can be removed now, as you like; 
+	select 'y' to "Remove/uninstall package 'test.htm'"; 
+	or execute manually
 ```
 npm uninstall test.htm --no-save
 ```
