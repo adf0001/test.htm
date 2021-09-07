@@ -10,7 +10,10 @@ test htm template
 npm install test.htm --no-save
 ```
 
-3. double click to run './node_modules/test.htm/dev-0-1-copy-files.bat';
+3. run copy-files tool, or double click to run
+```
+./node_modules/test.htm/dev-0-1-copy-files.bat
+```
 
 	* optional, to copy mocha tools, select 'y' to "For mocha";
 	
