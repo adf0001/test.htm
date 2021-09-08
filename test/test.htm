@@ -41,9 +41,9 @@ code<br>
 
 // page code
 
-var ele= function(idOrEl){ return ( typeof idOrEl==="string")? document.getElementById(idOrEl) : idOrEl;}
+var _ele= function(idOrEl){ return ( typeof idOrEl==="string")? document.getElementById(idOrEl) : idOrEl;}
 
-var dateString19= function (dt) {
+var _dateString19= function (dt) {
 	if( !dt ) dt= new Date();
 	
 	var s = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() +
@@ -52,19 +52,19 @@ var dateString19= function (dt) {
 }
 
 function runItem( func ){
-	ele('divResult').innerHTML=  ele('divResult2').innerHTML=  ele('divResult3').innerHTML= "";
+	_ele('divResult').innerHTML=  _ele('divResult2').innerHTML=  _ele('divResult3').innerHTML= "";
 	
 	try{
-		var name= ele('inpName').value;
-		var ret= func ? func( function(ret){doneCallback(ret,name)} ) : eval(ele('txtCode').value);
+		var name= _ele('inpName').value;
+		var ret= func ? func( function(ret){doneCallback(ret,name)} ) : eval(_ele('txtCode').value);
 		if( ret ) setOk(name);
 	}
 	catch(ex){
 		console.log(ex);
-		ele('divResult').textContent= ex;
+		_ele('divResult').textContent= ex;
 		return;
 	}
-	ele('divResult').innerHTML= dateString19(new Date()).slice(-8) + " / " + ele('inpName').value + "<br>" + ret;
+	_ele('divResult').innerHTML= _dateString19(new Date()).slice(-8) + " / " + _ele('inpName').value + "<br>" + ret;
 }
 
 function onClickItem(evt){
@@ -72,14 +72,14 @@ function onClickItem(evt){
 	if( el.tagName.toUpperCase()!="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
 	
 	var name= el.textContent;
-	ele('inpName').value= name;
+	_ele('inpName').value= name;
 	
 	var item= testData[name], sCode;
 	if( typeof item==="function" ){ sCode= ("(\n\t"+item+"\n)(function(ret){doneCallback(ret,'"+name+"')})"); }
 	else{ sCode= item; }
-	ele('txtCode').value= sCode;
+	_ele('txtCode').value= sCode;
 	
-	ele('divResult').innerHTML=  ele('divResult2').innerHTML=  ele('divResult3').innerHTML= "";
+	_ele('divResult').innerHTML=  _ele('divResult2').innerHTML=  _ele('divResult3').innerHTML= "";
 	if( !sCode ) return;
 	
 	runItem( ( typeof item==="function" ) ? item : null );	//run function at the 1st time, to enable inline debugger.
@@ -89,39 +89,39 @@ function runAll(){
 	if( ! window.confirm("run all ?") ) return;
 	
 	for(var i in testData){
-		onClickItem( {target:ele('spCmdList').querySelector("span[name='"+i.replace(/\W/g,"-")+"']")} );
+		onClickItem( {target:_ele('spCmdList').querySelector("span[name='"+i.replace(/\W/g,"-")+"']")} );
 	}
 }
 
 function onBodyLoad(){
 	var ks= Object.keys(testData);
-	ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
+	_ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
 		"<br><br><div style='font-size:9pt;font-weight:bold;'>count: <i class='ht-cmd' onclick='runAll()' title='run all ...'>"+ks.length+"</i></div>";
 }
 
 function setOk(name){
-	ele('spCmdList').querySelector("span[name='"+name.replace(/\W/g,"-")+"']").style.background="lime";
+	_ele('spCmdList').querySelector("span[name='"+name.replace(/\W/g,"-")+"']").style.background="lime";
 }
 
 function doneCallback( ret, setOkName ){
-	ele('divResult2').innerHTML= ret;
+	_ele('divResult2').innerHTML= ret;
 	if( !ret && setOkName ) setOk(setOkName);
 }
 
 function setHtmlPage( name, itemsColWidth, itemsColCount ){
 	document.title="test - "+name;
-	ele('txtTitle').innerHTML= "test "+name;
+	_ele('txtTitle').innerHTML= "test "+name;
 	if( itemsColWidth ) {
-		ele('txtTitle').parentNode.style.width= itemsColWidth;
+		_ele('txtTitle').parentNode.style.width= itemsColWidth;
 		document.body.style.paddingLeft= itemsColWidth;
 	}
 	if( itemsColCount>1 ){
-		ele('spCmdList').style.columnCount= itemsColCount;
+		_ele('spCmdList').style.columnCount= itemsColCount;
 	}
 }
 
 function showResult( text, divIndex ){
-	ele('divResult'+(divIndex||"")).innerHTML= text.replace( /\n/g, "<br>");
+	_ele('divResult'+(divIndex||"")).innerHTML= text.replace( /\n/g, "<br>");
 }
 
 </script>
