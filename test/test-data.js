@@ -1,5 +1,5 @@
-
-setHtmlPage("sample","10em");	//html page setting
+﻿
+setHtmlPage("sample","10em",1);	//html page setting
 
 var sample= ( typeof module==="object" && module.exports ) ? require("../sample.js") : require( "sample" );
 
@@ -23,7 +23,7 @@ testData={		//global variable
 	"test 6": function(done){
 		setTimeout( function(){ done(!sample.funcFalse())},1000 );
 	},
-		
+	
 	
 	/*
 	//code template

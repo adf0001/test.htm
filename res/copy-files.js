@@ -54,7 +54,7 @@ var replaceMode="";
 async function copyReplacedFile( fname, replacePairArray, protectUserFile ){
 	if( fs.existsSync( destDir + fname ) ){
 		if( protectUserFile ){
-			console.warn( fname + " ........................ skip existed and protected !!!" );
+			console.warn( fname + " ........................ skip protected !!!" );
 			return;
 		}
 		

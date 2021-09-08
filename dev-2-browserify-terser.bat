@@ -1,8 +1,10 @@
 
 chcp 936
 
+for /F %%i in ('npm root -g') do ( set globalModulePath=%%i)
+
 set browserifyPath="browserify.cmd"
-set bundleCollapserPath="%USERPROFILE%\AppData\Roaming\npm\node_modules\bundle-collapser\plugin"
+set bundleCollapserPath="%globalModulePath%/bundle-collapser/plugin"
 set terserPath="terser.cmd"
 
 set module=sample

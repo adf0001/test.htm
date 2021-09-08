@@ -96,7 +96,7 @@ function runAll(){
 function onBodyLoad(){
 	var ks= Object.keys(testData);
 	ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
-		"<br><br><div style='font-size:9pt;font-weight:bold;'>count: <i class='ht-cmd' onclick='runAll()' title='run all'>"+ks.length+"</i></div>";
+		"<br><br><div style='font-size:9pt;font-weight:bold;'>count: <i class='ht-cmd' onclick='runAll()' title='run all ...'>"+ks.length+"</i></div>";
 }
 
 function setOk(name){

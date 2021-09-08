@@ -1,2 +1,2 @@
 call mocha
-rem pause
+pause
