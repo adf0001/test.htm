@@ -22,6 +22,10 @@ npm install test.htm --no-save
 * optional, at first time usage, select 'y' to "Install global environment";
 	or double click to run './node_modules/test.htm/dev-0-0-install-global.bat';
 
+* optional, to copy tools for multiple projects, to the parent folder, select 'y' to "Copy tools for multiple projects";
+
+* optional, to append project link to the found projects tools, select 'y' to "Append project link";
+
 * optional, package 'test.htm' can be removed now, as you like; 
 	select 'y' to "Remove/uninstall package 'test.htm'"; 
 	or execute manually
@@ -54,6 +58,8 @@ npm uninstall test.htm --no-save
 │  │  │
 │  │  ├─res
 │  │  │      copy-files.js
+│  │  │      test-list.htm       //multiple projects tools
+│  │  │      test-list.js        //user defined multiple projects list
 │  │  │
 │  │  └─test
 │  │          test-data.js        //user defined test data

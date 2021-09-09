@@ -9,6 +9,7 @@ node res/copy-files.js
 @echo --------------------------------------------
 @echo.
 
+@SET inp=
 @SET /P inp=* Remove/uninstall package 'test.htm' ? y/n (n):
 
 @if "%inp%"=="y" (

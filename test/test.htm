@@ -124,8 +124,10 @@ function doneCallback( ret, setOkName ){
 }
 
 function setHtmlPage( name, itemsColWidth, itemsColCount ){
-	document.title="test - "+name;
-	_ele('txtTitle').innerHTML= "test "+name;
+	if( name ) {
+		document.title="test - "+name;
+		_ele('txtTitle').innerHTML= "test "+name;
+	}
 	if( itemsColWidth ) {
 		_ele('txtTitle').parentNode.style.width= itemsColWidth;
 		document.body.style.paddingLeft= itemsColWidth;

@@ -11,6 +11,8 @@ var srcDir= path.normalize(__dirname+"/../");
 var destDir= path.normalize(__dirname+"/../../../");
 console.log( "destination path: " + destDir );
 
+var destDirLast= path.basename(destDir);
+
 if( ! fs.existsSync( destDir + "package.json" ) ){
 	console.error( "error: 'package.json' not exists at "+destDir );
 	return;
@@ -49,20 +51,21 @@ async function consolePrompt( questionText ){
 /////////////////////////////////
 // copy file
 
-var replaceMode="";
-
-async function copyReplacedFile( fname, replacePairArray, protectUserFile ){
-	if( fs.existsSync( destDir + fname ) ){
+async function copyReplacedFile( fname, replacePairArray, protectUserFile, destFname ){
+	
+	if( ! destFname ) destFname= fname;
+	
+	if( fs.existsSync( destDir + destFname ) ){
 		if( protectUserFile ){
-			console.warn( fname + " ........................ skip protected !!!" );
-			return;
+			console.warn( destFname + " ........................ skip protected !!!" );
+			return false;
 		}
 		
-		var inp= await consolePrompt( "File '" + fname+"' is already existed, replaced it ? y/n (n):");
+		var inp= await consolePrompt( "File '" + destFname+"' is already existed, replaced it ? y/n (n):");
 		
 		if( inp!="y" ){
-			console.warn( fname + " ........................ skip existed !!!" );
-			return true;
+			console.warn( destFname + " ........................ skip existed !!!" );
+			return false;
 		}
 	}
 	
@@ -71,8 +74,8 @@ async function copyReplacedFile( fname, replacePairArray, protectUserFile ){
 	for(var i=0;i<replacePairArray.length;i+=2){
 		s=s.replace( replacePairArray[i], replacePairArray[i+1] );
 	}
-	fs.writeFileSync( destDir+fname, s );
-	console.warn( fname + " ...... copied" );
+	fs.writeFileSync( destDir+destFname, s );
+	console.log( destFname + " ...... copied" );
 	return true;
 }
 
@@ -98,6 +101,30 @@ async function mainAsync(){
 	inp= await consolePrompt('* Install global environment ( at first time usage )? y/n/r[re-install] (n):');
 	if( inp=="y" || inp=="r"  ){
 		child_process.execSync( srcDir+"dev-0-0-install-global.bat" +((inp=="r")?" -r":""), {stdio: 'inherit'} );
+	}
+	
+	var copyTestList=false;
+	inp= await consolePrompt('* Copy tools for multiple projects, to parent folder? y/n (n):');
+	if( inp=="y" ){
+		await copyReplacedFile( "res/test-list.htm", [], false, "../test-list.htm" );
+		
+		copyTestList= await copyReplacedFile( "res/test-list.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm"], true, "../test-list.js" );
+	}
+	
+	if( copyTestList!==true && fs.existsSync( destDir + "../test-list.js" ) ){
+		
+		var aListText= fs.readFileSync( destDir + "../test-list.js", 'utf-8' ).split("//__NEW_INSERTION_HERE__");
+		if( aListText.length==2 ){		//check format
+			inp= await consolePrompt('* Append project link \"'+name+'\" to ../test-list.js ? y/n (n):');
+			if( inp=="y" ){
+				if( ! aListText[0].match(/[\,\{]\s*$/) ) aListText[0]= aListText[0]+",\n\t";
+				aListText[0]+="\""+ name + "\": \"" + destDirLast+"/test/test.htm\",\n\t";
+				
+				fs.writeFileSync( destDir+"../test-list.js", aListText.join("//__NEW_INSERTION_HERE__") );
+				
+				console.log( "project \""+name+"\" ...... appended" );
+			}
+		}
 	}
 	
 	return true;

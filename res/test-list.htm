@@ -1,0 +1,75 @@
+﻿<html>
+<!-- template from https://github.com/adf0001/test.htm -->
+<head>
+<meta charset='utf-8'>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
+
+<title>test-list</title>
+
+<style>
+.ht-cmd {
+	color: green;
+	text-decoration: underline;
+	cursor: pointer;
+	font-size: 9pt;
+}
+.ht-cmd:hover{
+	background:#eeeeee;
+}
+</style>
+</head>
+<body onload="onBodyLoad()" style="padding-left:10em;">
+
+<div style='width:10em;position:fixed;left:0px;top:0px;bottom:0px;border-right:1px solid gray;overflow:auto;'>
+	<div id='spCmdList' onclick="onClickItem(arguments[0])" style='padding:0.5em;'></div>
+</div>
+<div style="position:fixed;left:10em;top:0px;bottom:0px;right:0px;box-sizing: border-box;">
+	<iframe id="ifPage" name="ifPage" src="about:blank" style="width:100%;height:100%;border:none;"></iframe>
+</div>
+
+</body>
+
+<script>
+
+// page code
+
+var _ele= function(idOrEl){ return ( typeof idOrEl==="string")? document.getElementById(idOrEl) : idOrEl;}
+
+function onClickItem(evt){
+	var el= evt.target;
+	if( el.tagName.toUpperCase()!="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
+	
+	var name= el.textContent;
+	var item= testList[name];
+	
+	_ele("ifPage").src= item;
+}
+
+function onBodyLoad(){
+	var ks= Object.keys(testList);
+	_ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
+		"<br><br><div style='font-size:9pt;font-weight0:bold;'>count: <i>"+ks.length+"</i></div>";
+	
+	setHtmlPage("","8em",1);
+}
+
+function setHtmlPage( name, itemsColWidth, itemsColCount ){
+	if( name ){
+		document.title= name;
+	}
+	if( itemsColWidth ) {
+		_ele('spCmdList').parentNode.style.width= itemsColWidth;
+		_ele('ifPage').parentNode.style.left= itemsColWidth;
+		document.body.style.paddingLeft= itemsColWidth;
+	}
+	if( itemsColCount>1 ){
+		_ele('spCmdList').style.columnCount= itemsColCount;
+	}
+}
+
+</script>
+
+<script src='./test-list.js'></script>
+
+</html>
+
