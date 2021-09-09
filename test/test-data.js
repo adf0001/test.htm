@@ -6,22 +6,22 @@ var sample= ( typeof module==="object" && module.exports ) ? require("../sample.
 testData={		//global variable
 	
 	"test 1": function(done){
-		return sample.funcTrue();
+		return sample.funcTrue();	//success, return true;
 	},
 	"test 2": function(done){
-		return sample.funcFalse();
+		return sample.funcFalse();	//fail, return false;
 	},
 	"test 3": function(done){
-		done(!sample.funcTrue());
+		done(!sample.funcTrue());	//success, call done( error = false );
 	},
 	"test 4": function(done){
-		done(!sample.funcFalse());
+		done(!sample.funcFalse());	//fail, call done( error = true );
 	},
 	"test 5": function(done){
-		setTimeout( function(){ done(!sample.funcTrue())},1000 );
+		setTimeout( function(){ done(!sample.funcTrue())},1000 );	//async success, call done( error = false );
 	},
 	"test 6": function(done){
-		setTimeout( function(){ done(!sample.funcFalse())},1000 );
+		setTimeout( function(){ done(!sample.funcFalse())},1000 );	//async fail, call done( error = true );
 	},
 	
 	

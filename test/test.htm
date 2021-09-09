@@ -53,11 +53,13 @@ var _dateString19= function (dt) {
 
 function runItem( func ){
 	_ele('divResult').innerHTML=  _ele('divResult2').innerHTML=  _ele('divResult3').innerHTML= "";
+	var name= _ele('inpName').value;
+	
+	setOk(name,null,1);		//reset color
 	
 	try{
-		var name= _ele('inpName').value;
 		var ret= func ? func( function(ret){doneCallback(ret,name)} ) : eval(_ele('txtCode').value);
-		if( ret ) setOk(name);
+		if( typeof ret!=="undefined" ) setOk(name, !ret );
 	}
 	catch(ex){
 		console.log(ex);
@@ -85,12 +87,25 @@ function onClickItem(evt){
 	runItem( ( typeof item==="function" ) ? item : null );	//run function at the 1st time, to enable inline debugger.
 }
 
-function runAll(){
-	if( ! window.confirm("run all ?") ) return;
-	
-	for(var i in testData){
-		onClickItem( {target:_ele('spCmdList').querySelector("span[name='"+i.replace(/\W/g,"-")+"']")} );
+var runAllDelay=0;
+var runAllKeys= null;
+
+function runAll( idx ){
+	if( ! idx ){
+		//initial
+		var delay= window.prompt("Click 'OK' to run all,\nand delay between each item at milliseconds",runAllDelay);
+		if( ! delay ) return;
+		runAllDelay= parseInt(delay)||0;
+		if( runAllDelay<0 ) runAllDelay=0;
+		
+		runAllKeys= Object.keys(testData);
 	}
+	
+	idx= idx || 0;
+	onClickItem( {target:_ele('spCmdList').querySelector("span[name='"+runAllKeys[idx].replace(/\W/g,"-")+"']")} );
+	
+	idx++;
+	if( idx< runAllKeys.length ) setTimeout( function(){ runAll(idx) }, runAllDelay );
 }
 
 function onBodyLoad(){
@@ -99,13 +114,13 @@ function onBodyLoad(){
 		"<br><br><div style='font-size:9pt;font-weight:bold;'>count: <i class='ht-cmd' onclick='runAll()' title='run all ...'>"+ks.length+"</i></div>";
 }
 
-function setOk(name){
-	_ele('spCmdList').querySelector("span[name='"+name.replace(/\W/g,"-")+"']").style.background="lime";
+function setOk(name, fail, reset){
+	_ele('spCmdList').querySelector("span[name='"+name.replace(/\W/g,"-")+"']").style.background=reset?"":(fail?"red":"lime");
 }
 
 function doneCallback( ret, setOkName ){
 	_ele('divResult2').innerHTML= ret;
-	if( !ret && setOkName ) setOk(setOkName);
+	if( setOkName ) setOk(setOkName, ret);
 }
 
 function setHtmlPage( name, itemsColWidth, itemsColCount ){
@@ -120,8 +135,9 @@ function setHtmlPage( name, itemsColWidth, itemsColCount ){
 	}
 }
 
-function showResult( text, divIndex ){
-	_ele('divResult'+(divIndex||"")).innerHTML= text.replace( /\n/g, "<br>");
+function showResult( text, divIndex, fail ){
+	_ele('divResult'+(divIndex||"")).innerHTML= (text+"").replace( /\n/g, "<br>");
+	if( fail || fail===false ) setOk( _ele('inpName').value, fail );
 }
 
 </script>
