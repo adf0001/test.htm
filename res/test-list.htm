@@ -16,6 +16,12 @@
 .ht-cmd:hover{
 	background:#eeeeee;
 }
+.ht-selected{
+	background:lavender;
+}
+.ht-selected:hover{
+	background:#F0F0FA;
+}
 </style>
 </head>
 <body onload="onBodyLoad()" style="padding-left:10em;">
@@ -35,14 +41,21 @@
 
 var _ele= function(idOrEl){ return ( typeof idOrEl==="string")? document.getElementById(idOrEl) : idOrEl;}
 
+var lastSelected=null;
+
 function onClickItem(evt){
 	var el= evt.target;
 	if( el.tagName.toUpperCase()!="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
+	
+	if( lastSelected ) lastSelected.classList.remove("ht-selected");
+	el.classList.add("ht-selected");
+	lastSelected= el;
 	
 	var name= el.textContent;
 	var item= testList[name];
 	
 	_ele("ifPage").src= item;
+	
 }
 
 function onBodyLoad(){
@@ -50,7 +63,7 @@ function onBodyLoad(){
 	_ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
 		"<br><br><div style='font-size:9pt;font-weight0:bold;'>count: <i>"+ks.length+"</i></div>";
 	
-	setHtmlPage("","8em",1);
+	setHtmlPage("","6.5em",1);
 }
 
 function setHtmlPage( name, itemsColWidth, itemsColCount ){
