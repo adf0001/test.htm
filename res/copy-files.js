@@ -127,6 +127,13 @@ async function mainAsync(){
 		}
 	}
 	
+	inp= await consolePrompt('* Copy tools for http, to parent folder? y/n (n):');
+	if( inp=="y" ){
+		await copyReplacedFile( "res/test-http.js", [], false, "../test-http.js" );
+		await copyReplacedFile( "res/test-http-config.js", [], true, "../test-http-config.js" );
+		await copyReplacedFile( "res/test-http.bat", [], false, "../test-http.bat" );
+	}
+	
 	return true;
 }
 

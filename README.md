@@ -26,6 +26,8 @@ npm install test.htm --no-save
 
 * optional, to append project link to the found projects tools, select 'y' to "Append project link";
 
+* optional, to copy tools for http debugging, to the parent folder, select 'y' to "Copy tools for http";
+
 * optional, package 'test.htm' can be removed now, as you like; 
 	select 'y' to "Remove/uninstall package 'test.htm'"; 
 	or execute manually
