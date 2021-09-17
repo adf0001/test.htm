@@ -36,7 +36,7 @@ npm uninstall test.htm --no-save
 ```
 
 4. now update file 'test/test-data.js' in your project with your code,
-	and open page 'test/test.htm' to test in browsers; or run 'test-http.bat' and open page '../test-list.htm' to test in browsers.
+	and open page 'test/test.htm' to test in browsers; or run 'test-http.bat' and open page '../test-multiple.htm' to test in browsers.
 
 
 ## file structure
@@ -60,8 +60,8 @@ npm uninstall test.htm --no-save
 │  │  │
 │  │  ├─res
 │  │  │      copy-files.js
-│  │  │      test-list.htm                //multiple projects tool
-│  │  │      test-list-config.js          //multiple projects tool config
+│  │  │      test-multiple.htm            //multiple projects tool
+│  │  │      test-multiple-config.js      //multiple projects tool config
 │  │  │      test-http.bat                //http running tool
 │  │  │      test-http.js                 //http tool
 │  │  │      test-http-config.js          //http tool config

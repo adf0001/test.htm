@@ -4,7 +4,7 @@
 <meta charset='utf-8'>
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=2.0, user-scalable=yes" />
 
-<title>test-list</title>
+<title>test-multiple</title>
 
 <style>
 .ht-cmd {
@@ -96,7 +96,7 @@ function onClickItem(evt){
 	lastSelected= el;
 	
 	var name= el.textContent;
-	var item= testList[name];
+	var item= test_multiple_config[name];
 	
 	var src= _ele("chkHttp").checked?( "http://"+test_http_config.http_ip+":"+(test_http_config.http_port)+"/"+item):item;
 	_ele("ifPage").src= src;
@@ -109,7 +109,7 @@ function onClickItem(evt){
 }
 
 function onBodyLoad(){
-	var ks= Object.keys(testList);
+	var ks= Object.keys(test_multiple_config);
 	_ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
 		"<br><br><div style='font-size:9pt;font-weight0:bold;'>count: <i>"+ks.length+"</i></div>";
 	
@@ -146,7 +146,7 @@ function sendHttpCmd( cmd, data, skipItem,  cb ){
 	var itemData= "";
 	if( lastSelected && !skipItem ){
 		var name= lastSelected.textContent;
-		var item= testList[name];
+		var item= test_multiple_config[name];
 		itemData= "&name="+ encodeURIComponent(name) + "&item=" + encodeURIComponent(JSON.stringify(item));
 	}
 	
@@ -247,7 +247,7 @@ function onClickWatchify(){
 
 </script>
 
-<script src='./test-list-config.js'></script>
+<script src='./test-multiple-config.js'></script>
 <script src='./test-http-config.js'></script>
 
 </html>

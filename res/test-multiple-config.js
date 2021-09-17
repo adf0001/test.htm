@@ -1,6 +1,6 @@
 ﻿
-//global variable
-testList={
+//global variable in not-common-js environment
+var test_multiple_config={
 	
 	"Sample": "../test/test.htm",
 	

@@ -105,12 +105,12 @@ async function mainAsync(){
 		await copyReplacedFile( "dev-2-browserify-terser.bat", simpleName ? ["sample", name]: ["sample", name,"%module%.js", mainName] );
 	}
 	
-	var copyTestList=false;
+	var copyTestMultiple=false;
 	inp= await consolePrompt('* Copy tools for multiple projects, to parent folder? y/n (n):');
 	if( inp=="y" ){
-		await copyReplacedFile( "res/test-list.htm", [], false, "../test-list.htm" );
+		await copyReplacedFile( "res/test-multiple.htm", [], false, "../test-multiple.htm" );
 		
-		copyTestList= await copyReplacedFile( "res/test-list-config.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm"], true, "../test-list-config.js" );
+		copyTestMultiple= await copyReplacedFile( "res/test-multiple-config.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm"], true, "../test-multiple-config.js" );
 	}
 	
 	inp= await consolePrompt('* Copy tools for http, to parent folder? y/n (n):');
@@ -121,16 +121,16 @@ async function mainAsync(){
 		await copyReplacedFile( "res/test-http.bat", [], false, "../test-http.bat" );
 	}
 	
-	if( copyTestList!==true && fs.existsSync( destDir + "../test-list-config.js" ) ){
+	if( copyTestMultiple!==true && fs.existsSync( destDir + "../test-multiple-config.js" ) ){
 		
-		var aListText= fs.readFileSync( destDir + "../test-list-config.js", 'utf-8' ).split("//__NEW_INSERTION_HERE__");
+		var aListText= fs.readFileSync( destDir + "../test-multiple-config.js", 'utf-8' ).split("//__NEW_INSERTION_HERE__");
 		if( aListText.length==2 ){		//check format
-			inp= await consolePrompt('* Append project link \"'+name+'\" to ../test-list-config.js ? y/n (n):');
+			inp= await consolePrompt('* Append project link \"'+name+'\" to ../test-multiple-config.js ? y/n (n):');
 			if( inp=="y" ){
 				if( ! aListText[0].match(/[\,\{]\s*$/) ) aListText[0]= aListText[0]+",\n\t";
 				aListText[0]+="\""+ name + "\": \"" + destDirLast+"/test/test.htm\",\n\t";
 				
-				fs.writeFileSync( destDir+"../test-list-config.js", aListText.join("//__NEW_INSERTION_HERE__") );
+				fs.writeFileSync( destDir+"../test-multiple-config.js", aListText.join("//__NEW_INSERTION_HERE__") );
 				
 				console.log( "project \""+name+"\" ...... appended" );
 			}
