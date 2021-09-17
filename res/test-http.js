@@ -6,10 +6,15 @@ var path = require("path");
 
 var config = require("./test-http-config.js");
 
+var extension= ( typeof config.extension==="string" ) ? [config.extension] : ( config.extension || [] );
+extension= extension.map( v=>require( v ) );
+
 console.log("http://" + config.http_ip+":"+ config.http_port);
 console.log("root: " + __dirname );
 
 http.createServer( function(req,res) {
+	for(var i in extension ){ if( extension[i](req,res) ) return; }
+	
 	var pathname = decodeURIComponent( url.parse(req.url).pathname );
 	console.log(pathname);
 	
@@ -17,7 +22,7 @@ http.createServer( function(req,res) {
 	if( pathname.slice(-1)==="/" ){
 		fs.readdir( __dirname+"/"+pathname, {withFileTypes:true}, function(err,data) {
 			if( err ) { console.log(err); res.writeHead(500,{"Content-type":"text"}); res.end(""+err); return; }
-			var a= data.map((v)=>{ var dirSlash=v.isDirectory() ? "/":""; return "<a href='"+ v.name+dirSlash+"'>"+ dirSlash + v.name + "</a>";});
+			var a= data.map(v=>{ var dirSlash=v.isDirectory() ? "/":""; return "<a href='"+ v.name+dirSlash+"'>"+ dirSlash + v.name + "</a>";});
 			res.writeHead(200,{"Content-type":"text/html;charset=UTF-8"});
 			res.end("<style>a{display:block;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;text-decoration:none;}a:hover{text-decoration:underline;}</style><div style='column-width:10em;'><a href='../'>/..</a>"+a.join("")+"</div>");
 		});

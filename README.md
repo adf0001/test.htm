@@ -15,18 +15,18 @@ npm install test.htm --no-save
 .\node_modules\test.htm\dev-0-1-copy-files.bat
 ```
 
-* optional, to copy mocha tools, select 'y' to "For mocha";
-
-* optional, to copy develope tools, select 'y' to "Copy develope tool";
-
 * optional, at first time usage, select 'y' to "Install global environment";
 	or double click to run './node_modules/test.htm/dev-0-0-install-global.bat';
 
+* optional, to copy mocha tools, select 'y' to "Copy for mocha";
+
+* optional, to copy develope tools, select 'y' to "Copy develope tools";
+
 * optional, to copy tools for multiple projects, to the parent folder, select 'y' to "Copy tools for multiple projects";
 
-* optional, to append project link to the found projects tools, select 'y' to "Append project link";
-
 * optional, to copy tools for http debugging, to the parent folder, select 'y' to "Copy tools for http";
+
+* optional, to append project link to the found projects tools, select 'y' to "Append project link";
 
 * optional, package 'test.htm' can be removed now, as you like; 
 	select 'y' to "Remove/uninstall package 'test.htm'"; 
@@ -36,7 +36,7 @@ npm uninstall test.htm --no-save
 ```
 
 4. now update file 'test/test-data.js' in your project with your code,
-	and open page 'test/test.htm' to test in browsers.
+	and open page 'test/test.htm' to test in browsers; or run 'test-http.bat' and open page '../test-list.htm' to test in browsers.
 
 
 ## file structure
@@ -60,8 +60,12 @@ npm uninstall test.htm --no-save
 │  │  │
 │  │  ├─res
 │  │  │      copy-files.js
-│  │  │      test-list.htm       //multiple projects tools
-│  │  │      test-list.js        //user defined multiple projects list
+│  │  │      test-list.htm                //multiple projects tool
+│  │  │      test-list-config.js          //multiple projects tool config
+│  │  │      test-http.bat                //http running tool
+│  │  │      test-http.js                 //http tool
+│  │  │      test-http-config.js          //http tool config
+│  │  │      test-http-extension.js       //http tool extension
 │  │  │
 │  │  └─test
 │  │          test-data.js        //user defined test data

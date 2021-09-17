@@ -86,21 +86,23 @@ async function mainAsync(){
 	await copyReplacedFile( "test/test.htm", [] );
 	await copyReplacedFile( "test/test-data.js", [ /\"sample\"/g, "\""+name+"\"", "../sample.js", "../"+mainName, /sample/g, newRef ], true );
 	
-	var inp= await consolePrompt('* For mocha? y/n (n):');
+	var inp;
+	
+	inp= await consolePrompt('* Install global environment ( at first time usage )? y/n/r[re-install] (n):');
+	if( inp=="y" || inp=="r"  ){
+		child_process.execSync( srcDir+"dev-0-0-install-global.bat" +((inp=="r")?" -r":""), {stdio: 'inherit'} );
+	}
+	
+	inp= await consolePrompt('* Copy for mocha? y/n (n):');
 	if( inp=="y" ){
 		await copyReplacedFile( "test/test.bat", [] );
 		await copyReplacedFile( "test/test.js", ['mocha-test','mocha-test: '+ name ] );
 	}
 	
-	inp= await consolePrompt('* Copy develope tool? y/n (n):');
+	inp= await consolePrompt('* Copy develope tools? y/n (n):');
 	if( inp=="y" ){
 		await copyReplacedFile( "dev-1-browserify-watchify.bat", simpleName ? ["sample", name]: ["sample", name,"%module%.js", mainName] );
 		await copyReplacedFile( "dev-2-browserify-terser.bat", simpleName ? ["sample", name]: ["sample", name,"%module%.js", mainName] );
-	}
-	
-	inp= await consolePrompt('* Install global environment ( at first time usage )? y/n/r[re-install] (n):');
-	if( inp=="y" || inp=="r"  ){
-		child_process.execSync( srcDir+"dev-0-0-install-global.bat" +((inp=="r")?" -r":""), {stdio: 'inherit'} );
 	}
 	
 	var copyTestList=false;
@@ -108,30 +110,31 @@ async function mainAsync(){
 	if( inp=="y" ){
 		await copyReplacedFile( "res/test-list.htm", [], false, "../test-list.htm" );
 		
-		copyTestList= await copyReplacedFile( "res/test-list.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm"], true, "../test-list.js" );
-	}
-	
-	if( copyTestList!==true && fs.existsSync( destDir + "../test-list.js" ) ){
-		
-		var aListText= fs.readFileSync( destDir + "../test-list.js", 'utf-8' ).split("//__NEW_INSERTION_HERE__");
-		if( aListText.length==2 ){		//check format
-			inp= await consolePrompt('* Append project link \"'+name+'\" to ../test-list.js ? y/n (n):');
-			if( inp=="y" ){
-				if( ! aListText[0].match(/[\,\{]\s*$/) ) aListText[0]= aListText[0]+",\n\t";
-				aListText[0]+="\""+ name + "\": \"" + destDirLast+"/test/test.htm\",\n\t";
-				
-				fs.writeFileSync( destDir+"../test-list.js", aListText.join("//__NEW_INSERTION_HERE__") );
-				
-				console.log( "project \""+name+"\" ...... appended" );
-			}
-		}
+		copyTestList= await copyReplacedFile( "res/test-list-config.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm"], true, "../test-list-config.js" );
 	}
 	
 	inp= await consolePrompt('* Copy tools for http, to parent folder? y/n (n):');
 	if( inp=="y" ){
 		await copyReplacedFile( "res/test-http.js", [], false, "../test-http.js" );
 		await copyReplacedFile( "res/test-http-config.js", [], true, "../test-http-config.js" );
+		await copyReplacedFile( "res/test-http-extension.js", [], false, "../test-http-extension.js" );
 		await copyReplacedFile( "res/test-http.bat", [], false, "../test-http.bat" );
+	}
+	
+	if( copyTestList!==true && fs.existsSync( destDir + "../test-list-config.js" ) ){
+		
+		var aListText= fs.readFileSync( destDir + "../test-list-config.js", 'utf-8' ).split("//__NEW_INSERTION_HERE__");
+		if( aListText.length==2 ){		//check format
+			inp= await consolePrompt('* Append project link \"'+name+'\" to ../test-list-config.js ? y/n (n):');
+			if( inp=="y" ){
+				if( ! aListText[0].match(/[\,\{]\s*$/) ) aListText[0]= aListText[0]+",\n\t";
+				aListText[0]+="\""+ name + "\": \"" + destDirLast+"/test/test.htm\",\n\t";
+				
+				fs.writeFileSync( destDir+"../test-list-config.js", aListText.join("//__NEW_INSERTION_HERE__") );
+				
+				console.log( "project \""+name+"\" ...... appended" );
+			}
+		}
 	}
 	
 	return true;

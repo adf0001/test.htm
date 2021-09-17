@@ -13,6 +13,8 @@ var test_http_config ={
 		"bat":"text/bat",
 		"txt":"text/plain",
 	},
+	
+	extension: "./test-http-extension.js",
 };
 
 try{ module.exports = test_http_config; } catch(ex) { }
