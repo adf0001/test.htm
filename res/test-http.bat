@@ -1,4 +1,6 @@
 
+chcp 65001
+
 set supervisorPath=supervisor.cmd
 
 title supervisor - test-http - %CD%

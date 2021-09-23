@@ -48,13 +48,19 @@
 }
 </style>
 </head>
-<body onload="onBodyLoad()" style="padding-left:10em;">
+<body style="padding-left:10em;">
 
 <div id='divTopBar' style='height:1.5em;position:fixed;left:0px;top:0px;right:0px;border-bottom:1px solid gray;overflow:auto;'>
 	<div style="font-size:9pt;padding:0em 1em;vertical-align:top;">
 		<label><input type=checkbox id='chkHttp' onclick="onClickHttp()">http</label>
 		<span id="spHttpTool" style="display:none;padding-left:1em;">
 			{ <label><input type=checkbox id='chkWatchify' onclick="onClickWatchify()">watchify</label> }
+			{	View
+				<label><input type=radio name="viewType" value='page' checked onclick="updateFrameView()"> page</label>
+				<label><input type=radio name="viewType" value='browse' onclick="updateFrameView()"> browse</label>
+				<label><input type=radio name="viewType" value='console' onclick="updateFrameView()"> console</label>
+				
+			}
 		</span>
 		<a style='float:right;color:blue;' href="about:blank;" target="_blank" id='addrLink' title='open in new window'>about:blank</a>
 	</div>
@@ -108,6 +114,14 @@ var _httpRequest= function( url, methodOrOptions, postData, cb, lastKey ){
 
 var lastSelected=null;
 
+function getRadioInputValue( radioName ){
+	var els= document.getElementsByName(radioName);
+	for(var i=0;i<els.length;i++){
+		if( els[i].checked ) return els[i].value;
+	}
+	return null;
+}
+
 function onClickItem(evt){
 	var el= evt.target;
 	if( el.tagName.toUpperCase()!="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
@@ -119,7 +133,21 @@ function onClickItem(evt){
 	var name= el.textContent;
 	var item= test_multiple_config[name];
 	
-	var src= _ele("chkHttp").checked?( "http://"+test_http_config.http_ip+":"+(test_http_config.http_port)+"/"+item):item;
+	var src;
+	if( _ele("chkHttp").checked ){
+		var viewType= getRadioInputValue("viewType");
+		//alert(viewType);
+		
+		src= "http://"+test_http_config.http_ip+":"+test_http_config.http_port+"/";
+		
+		if( viewType=="browse" ) src += dirPart(item)+"../";
+		else if( viewType=="console" ) src+= "?cmd=viewConsole&name=" + encodeURIComponent(name);
+		else src += item;	//page
+	}
+	else {
+		src= item;
+	}
+	
 	_ele("ifPage").src= src;
 	_ele("addrLink").textContent= src;
 	_ele("addrLink").href= src;
@@ -134,7 +162,7 @@ var linkData={};
 
 function loadLinkData(name){
 	sendHttpCmd( "loadLink", "name="+name, false,
-		(err, data)=>{
+		function(err, data){
 			if(err) return;
 			
 			var cfg= JSON.parse( data.slice(1) );
@@ -213,9 +241,20 @@ function onClickLinkItem(evt){
 	el.classList.add("ht-selected");
 	lastSelected= el;
 	
-	//console.log(test_multiple_config);
-	var src= _ele("chkHttp").checked?( "http://"+test_http_config.http_ip+":"+(test_http_config.http_port)+"/"+prj.pageUrl) : prj.pagePath;
-	//alert(src);
+	var src;
+	if( _ele("chkHttp").checked ){
+		var viewType= getRadioInputValue("viewType");
+		//alert(viewType);
+		
+		src= "http://"+test_http_config.http_ip+":"+test_http_config.http_port+"/";
+		
+		if( viewType=="browse" ) src += dirPart(prj.pageUrl)+"../";
+		else if( viewType=="console" ) src+= "?cmd=viewConsole&name=" + encodeURIComponent( prj.name );
+		else src += prj.pageUrl;	//page
+	}
+	else {
+		src= prj.pagePath;
+	}
 	
 	_ele("ifPage").src= src;
 	_ele("addrLink").textContent= src;
@@ -316,6 +355,8 @@ function onBodyLoad(){
 	setHtmlPage("","8em",1);
 }
 
+window.onload= onBodyLoad;
+
 function setHtmlPage( name, itemsColWidth, itemsColCount ){
 	if( name ){
 		document.title= name;
@@ -330,9 +371,13 @@ function setHtmlPage( name, itemsColWidth, itemsColCount ){
 	}
 }
 
+function updateFrameView(){
+	if(lastSelected){ (lastSelected.classList.contains("link-item") ? onClickLinkItem: onClickItem) ({target:lastSelected}); }
+}
+
 function onClickHttp(){
 	var chk= _ele("chkHttp").checked;
-	if(lastSelected){ (lastSelected.classList.contains("link-item") ? onClickLinkItem: onClickItem) ({target:lastSelected}); }
+	updateFrameView();
 	
 	if( chk ) getSpawnState();
 	else{
@@ -351,7 +396,7 @@ function sendHttpCmd( cmd, data, addItemData,  cb ){
 	lastServerState="";
 	
 	return _httpRequest( "http://"+test_http_config.http_ip+":"+(test_http_config.http_port)+"/?cmd="+cmd+ itemData + (data?("&" + data):""),"GET","",
-		(err, data)=>{
+		function(err, data){
 			if( err ) {
 				if(err.status!==0){		//skip xhr abort
 					console.error( JSON.stringify(err).slice(0,200) );
@@ -378,7 +423,7 @@ function getSpawnState(){
 	if( lastSpawnStateXhr ) { lastServerState=""; lastSpawnStateXhr.abort(); lastSpawnStateXhr= null; }
 	
 	var xq= lastSpawnStateXhr= sendHttpCmd( "getSpawnState", "lastState="+encodeURIComponent(lastServerState), false,
-		(err, data)=>{
+		function(err, data){
 			if( lastSpawnStateXhr ===xq ) lastSpawnStateXhr= null;
 			
 			if(_ele("chkHttp").checked && stateErrorCount<3 ) tmidGetSpawnState= setTimeout( getSpawnState, 1000 );

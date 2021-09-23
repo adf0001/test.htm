@@ -12,6 +12,8 @@ var test_http_config ={
 		"js":"text/javascript",
 		"bat":"text/bat",
 		"txt":"text/plain",
+		"md":"text/x-markdown",
+		
 	},
 	
 	extension: "./test-http-extension.js",

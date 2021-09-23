@@ -1,6 +1,4 @@
 
-chcp 936
-
 for /F %%i in ('npm root -g') do ( set globalModulePath=%%i)
 
 set browserifyPath="browserify.cmd"

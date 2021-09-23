@@ -1,6 +1,4 @@
 
-chcp 936
-
 set watchifyPath="watchify.cmd"
 
 set module=sample

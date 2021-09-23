@@ -144,6 +144,10 @@ function controlChildSpawn( group, name, op, commandPath, args, options ){
 	else if( op==="stop" ){
 		if( item ){ item.process.kill(); }
 	}
+	else if( op==="view" ){
+		if( ! item || ! item.console ) return "(void)";
+		else return "\n"+item.console.join("\n");
+	}
 	
 	return true;
 }
@@ -291,16 +295,18 @@ function loadLinkFile( res, linkPath ){
 	if( !projectData[link] ){ responseError( res, "link unfound, " + link ); return; }
 	
 	//file
-	//console.log(__dirname+"/"+ projectData[link].link);
+	console.log(__dirname+"/"+ projectData[link].link);
 	var root= path.dirname( path.normalize( __dirname+"/"+ projectData[link].link ));
 	
 	var pathname = path.normalize( root + "/" + decodeURIComponent( linkFilePath ));
 	if( ! config.extension_allow_link_ouside && pathname.indexOf(root)!==0 ){ responseError( res, "outside link path, " + link ); return; }
 	
 	console.log("link file, "+link+" : "+ path.dirname(projectData[link].link) + "/ " + linkFilePath );
+	//console.log(pathname);
 	
 	//directory
-	if( pathname.slice(-1)==="/" ){
+	//if( pathname.slice(-1)==="/" ){
+	if( linkFilePath.slice(-1)==="/" ){
 		fs.readdir( pathname, {withFileTypes:true}, function(err,data) {
 			if( err ) { console.log(err); res.writeHead(500,{"Content-type":"text/plain;charset=UTF-8"}); res.end(""+err); return; }
 			var a= data.map(v=>{ var dirSlash=v.isDirectory() ? "/":""; return "<a href='"+ v.name+dirSlash+"'>"+ dirSlash + v.name + "</a>";});
@@ -378,14 +384,17 @@ module.exports = function(req,res){
 	
 	console.log( "cmd=" + cmd + ", name=" + name + ", link=" + link );
 	
-	if( cmd==="startWatchify" || cmd==="stopWatchify"){
+	if( cmd==="startWatchify" || cmd==="stopWatchify" || cmd==="viewConsole"){
 		
 		var execPath= path.normalize( __dirname +"/" + (link?(path.dirname( projectData[link].link ) + "/"):"") + ( item.watchify|| (path.dirname( item.page ) +"/../dev-1-browserify-watchify.bat") ) );
 		console.log( cmd + ", " + execPath);
 		
-		var ret= controlChildSpawn( "watchify", name, (cmd==="startWatchify")?"start":"stop", execPath );
+		var ret= controlChildSpawn( "watchify", name, cmd.match(/^[a-z]+/)[0], execPath );
 		
 		if( ret instanceof Error ) responseError( res, ""+ret );
+		else if( typeof ret==="string" ){
+			responseOk( res, ret );
+		}
 		else responseOk( res, cmd );
 	}
 	else return;
