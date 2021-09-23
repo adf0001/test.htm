@@ -110,7 +110,7 @@ async function mainAsync(){
 	if( inp=="y" ){
 		await copyReplacedFile( "res/test-multiple.htm", [], false, "../test-multiple.htm" );
 		
-		copyTestMultiple= await copyReplacedFile( "res/test-multiple-config.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm"], true, "../test-multiple-config.js" );
+		copyTestMultiple= await copyReplacedFile( "res/test-multiple-config.js", ["Sample",name,"../test/test.htm",destDirLast+"/test/test.htm","\"module\":","//\"module\":"], true, "../test-multiple-config.js" );
 	}
 	
 	inp= await consolePrompt('* Copy tools for http, to parent folder? y/n (n):');

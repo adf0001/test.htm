@@ -15,6 +15,9 @@ var test_http_config ={
 	},
 	
 	extension: "./test-http-extension.js",
+	
+	//extension_allow_link_ouside: true,
+	
 };
 
 try{ module.exports = test_http_config; } catch(ex) { }

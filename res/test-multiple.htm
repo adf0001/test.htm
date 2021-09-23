@@ -27,6 +27,25 @@
 	background: lime;
 	margin-left:0.5em;
 }
+.link-multiple{
+	color: blue;
+	font-size: 9pt;
+}
+.link-item{
+	padding-left:0.5em;
+}
+.link-item-duplicate{
+	padding-left:0.5em;
+	font-size: 9pt;
+	color:lightgrey;
+	text-decoration: line-through;
+}
+.item-count{
+	font-size:9pt;
+	font-weight0:bold;
+	padding-left0:0.5em;
+	text-align:right;
+}
 </style>
 </head>
 <body onload="onBodyLoad()" style="padding-left:10em;">
@@ -43,6 +62,8 @@
 <div id='divProjectList' style='width:10em;position:fixed;left:0px;top:1.5em;bottom:0px;border-right:1px solid gray;overflow:auto;'>
 	<center style='font-weight:bold;' id='txtTitle'>Projects</center>
 	<div id='spCmdList' onclick="onClickItem(arguments[0])" style='padding:0.5em;'></div>
+	<center style='font-weight:bold;display:none;margin-top:1em;' id='txtLinkTitle'>Links</center>
+	<div id='spLinkList' onclick="onClickLinkItem(arguments[0])" style='padding:0.5em;display:none;'></div>
 </div>
 <div style="position:fixed;left:10em;top:1.5em;bottom:0px;right:0px;box-sizing: border-box;">
 	<iframe id="ifPage" name="ifPage" src="about:blank" style="width:100%;height:100%;border:none;"></iframe>
@@ -105,17 +126,194 @@ function onClickItem(evt){
 	
 	_ele("spHttpTool").style.display= _ele("chkHttp").checked?"":"none";
 	
-	_ele("chkWatchify").checked= (lastState["watchify"] && lastState["watchify"][name]) ? true: false;
+	var prj= getProjectInfo( el );
+	_ele("chkWatchify").checked= (lastState["watchify"] && lastState["watchify"][prj.pagePath]) ? true: false;
 }
 
+var linkData={};
+
+function loadLinkData(name){
+	sendHttpCmd( "loadLink", "name="+name, false,
+		(err, data)=>{
+			if(err) return;
+			
+			var cfg= JSON.parse( data.slice(1) );
+			var newItem= loadProject(cfg,name);
+			
+			var a=[], link=[];
+			newItem.map( function(v){
+				if( v.match(/\/\*$/)){
+					link[link.length]= "\n<span class='ht-cmd link-multiple' name=\""+safeString(v)+"\">" +v+"</span>";
+				}
+				else if( projectPage[ normalizePath( projectData[name].link.replace(/[^\/\\]+$/,"")+ projectData[v].page) ][v]===1 ){
+					var prj= getProjectInfo(null,v.slice(name.length+1),name);
+					a[a.length]= "\n<span class='ht-cmd link-item"+( (lastState["watchify"] && lastState["watchify"][prj.pagePath]) ? " state-watchify" : "" )+"' test_link=\""+name+"\" name=\""+safeString(v)+"\">" +v.slice(name.length+1)+"</span>";
+				}
+				else{
+					a[a.length]= "\n<span class='link-item-duplicate' title='project duplicated'>" +v.slice(name.length+1)+"</span>";
+				}
+			});
+			
+			var el= _ele('spLinkList').querySelector("span[name='"+safeString(name)+"']");
+			el.classList.remove("ht-cmd");
+			el.insertAdjacentHTML('afterend',"<br>"+a.join("<br>")+
+				"<div class='item-count'>count: <i>"+a.length+"</i></div>");
+			
+			if( link.length>0 ){
+				_ele('txtLinkTitle').style.display="";
+				_ele('spLinkList').style.display="";
+				_ele('spLinkList').insertAdjacentHTML( "beforeend",link.join("<br>") );
+			}
+
+		}
+	);
+}
+
+//return { name, data, link, linkData }
+function getProjectInfo( el, name, link ){
+	var prj= { name:name, link:link };
+	
+	if( el ){
+		prj.name= el.textContent;
+		prj.link= el.getAttribute("test_link")||"";
+	}
+	
+	if( prj.link ){
+		prj.name= prj.link+"/"+prj.name;
+		prj.linkData= projectData[prj.link];
+	}
+	
+	prj.data= projectData[prj.name];
+	if( prj.data.page ){
+		if( prj.link ){
+			prj.pagePath= normalizePath( dirPart(prj.linkData.link)+prj.data.page );
+			prj.pageUrl= prj.link+"/"+ prj.data.page.replace(/(^|\/)\.\.\//g, "$1**/");		//encode "../"
+		}
+		else {
+			prj.pagePath= prj.pageUrl= prj.data.page;
+		}
+	}
+	
+	return prj;
+}
+
+function onClickLinkItem(evt){
+	
+	var el= evt.target;
+	if( el.tagName.toUpperCase()!="SPAN" || el.className.indexOf("ht-cmd")<0 ) return;
+	
+	var prj= getProjectInfo( el );
+	
+	if( el.classList.contains("link-multiple") ){
+		if( ! prj.loaded ) loadLinkData( prj.name );
+		return;
+	}
+	
+	if( lastSelected ) lastSelected.classList.remove("ht-selected");
+	el.classList.add("ht-selected");
+	lastSelected= el;
+	
+	//console.log(test_multiple_config);
+	var src= _ele("chkHttp").checked?( "http://"+test_http_config.http_ip+":"+(test_http_config.http_port)+"/"+prj.pageUrl) : prj.pagePath;
+	//alert(src);
+	
+	_ele("ifPage").src= src;
+	_ele("addrLink").textContent= src;
+	_ele("addrLink").href= src;
+	
+	_ele("spHttpTool").style.display= _ele("chkHttp").checked?"":"none";
+	
+	_ele("chkWatchify").checked= (lastState["watchify"] && lastState["watchify"][prj.pagePath]) ? true: false;
+}
+
+//////////////////////////////////
+// project data
+
+var projectData={};		//map project name to project data
+var projectPage={};		//map project page to {name:1 or 2}, to check page duplicated.
+
+
+function dirPart( path ){	//like path.dirname() + "/"
+	return path.replace( /[\\\/]+$/ ,"").replace( /[^\\\/]+$/ ,"");
+}
+
+function normalizePath( path ){		//like path.normalize()
+	path= path.replace( /(^|[\\\/])(\.([\\\/]|$))+/g, "$1" );
+	var last="";
+	while( path && last!=path ){
+		last= path;
+		path= path.replace( /(^|[\\\/])([^\.\\\/]|\.+[^\.\\\/])[^\\\/]*[\\\/]\.\.([\\\/]|$)/, "$1" );
+	}
+	return path;
+}
+
+function loadProject( projectConfig, link ){
+	var i,v,newItem=[],linkPage;
+	var linkPath= link? dirPart( projectData[link].link ) : "";
+	
+	for(i in projectConfig){
+		if( i.indexOf("/*")>=0 ) continue;	//skip abnormal name
+		
+		v= projectConfig[i];
+		if( !v ) continue;
+		
+		if( typeof v==="string" ) {
+			if( v.match(/\btest\-multiple\-config\.js$/ ) ) {		//link
+				i+="/*";
+				if( ! projectData[i] ){
+					projectData[i]={ link: link?(linkPath+v):v };
+					newItem[newItem.length]=i;
+				}
+				continue;
+			}
+			v= { page: v };		//default page string
+		}
+		
+		if( link ){ i= link+"/"+i; }
+		
+		if( projectData[i] || !v.page ) continue;	//page already existed
+		projectData[i]=v;
+		
+		linkPage= normalizePath(linkPath+v.page);
+		if(!projectPage[linkPage]) { projectPage[linkPage]={}; projectPage[linkPage][i]=1; }
+		else { projectPage[linkPage][i]=2; }
+		
+		newItem[newItem.length]=i;
+	}
+	
+	if( link ) projectData[link].loaded= 1;
+	
+	if( newItem.length>0 ) console.log(projectData,projectPage,newItem);
+	return newItem;
+}
+
+//--------------------------------
+
+
+function safeString(str){ return str.replace( /[\\\'\"\`]/g, "-" ); }
+
 function onBodyLoad(){
-	var ks= Object.keys(test_multiple_config);
-	_ele('spCmdList').innerHTML=  ks.map( function(v){return "\n<span class='ht-cmd' name=\""+v.replace(/\W/g,"-")+"\">" +v+"</span>";}).join("<br>")+
-		"<br><br><div style='font-size:9pt;font-weight0:bold;'>count: <i>"+ks.length+"</i></div>";
+	var i,item;
+	var a=[], link=[];
+	
+	var newItem= loadProject(test_multiple_config);
+	newItem.map( function(v){
+		if( v.match(/\/\*$/)) link[link.length]= "\n<span class='ht-cmd link-multiple' name=\""+safeString(v)+"\">" +v+"</span>";
+		else a[a.length]= "\n<span class='ht-cmd' name=\""+safeString(v)+"\">" +v+"</span>";
+	});
+	
+	_ele('spCmdList').innerHTML= a.join("<br>")+
+		"<div class='item-count'>count: <i>"+a.length+"</i></div>";
+	
+	if( link.length>0 ){
+		_ele('txtLinkTitle').style.display="";
+		_ele('spLinkList').style.display="";
+		_ele('spLinkList').innerHTML= link.join("<br>");
+	}
 	
 	_ele('chkHttp').checked= false;
 	
-	setHtmlPage("","6.5em",1);
+	setHtmlPage("","8em",1);
 }
 
 function setHtmlPage( name, itemsColWidth, itemsColCount ){
@@ -128,12 +326,13 @@ function setHtmlPage( name, itemsColWidth, itemsColCount ){
 	}
 	if( itemsColCount>1 ){
 		_ele('spCmdList').style.columnCount= itemsColCount;
+		_ele('spLinkList').style.columnCount= itemsColCount;
 	}
 }
 
 function onClickHttp(){
 	var chk= _ele("chkHttp").checked;
-	if(lastSelected) onClickItem({target:lastSelected});
+	if(lastSelected){ (lastSelected.classList.contains("link-item") ? onClickLinkItem: onClickItem) ({target:lastSelected}); }
 	
 	if( chk ) getSpawnState();
 	else{
@@ -142,12 +341,11 @@ function onClickHttp(){
 	stateErrorCount=0;
 }
 
-function sendHttpCmd( cmd, data, skipItem,  cb ){
+function sendHttpCmd( cmd, data, addItemData,  cb ){
 	var itemData= "";
-	if( lastSelected && !skipItem ){
-		var name= lastSelected.textContent;
-		var item= test_multiple_config[name];
-		itemData= "&name="+ encodeURIComponent(name) + "&item=" + encodeURIComponent(JSON.stringify(item));
+	if( lastSelected && addItemData ){
+		var prj= getProjectInfo(lastSelected);
+		itemData= "&name="+ encodeURIComponent(prj.name);
 	}
 	
 	lastServerState="";
@@ -179,15 +377,17 @@ function getSpawnState(){
 	
 	if( lastSpawnStateXhr ) { lastServerState=""; lastSpawnStateXhr.abort(); lastSpawnStateXhr= null; }
 	
-	var xq= lastSpawnStateXhr= sendHttpCmd( "getSpawnState", "lastState="+encodeURIComponent(lastServerState), true,
+	var xq= lastSpawnStateXhr= sendHttpCmd( "getSpawnState", "lastState="+encodeURIComponent(lastServerState), false,
 		(err, data)=>{
 			if( lastSpawnStateXhr ===xq ) lastSpawnStateXhr= null;
 			
 			if(_ele("chkHttp").checked && stateErrorCount<3 ) tmidGetSpawnState= setTimeout( getSpawnState, 1000 );
 			
 			if( err || data.charAt(0)!="1"){
-				_ele("chkHttp").parentNode.style.color='red';
-				stateErrorCount++;
+				if( err.status!==0 ){
+					_ele("chkHttp").parentNode.style.color='red';
+					stateErrorCount++;
+				}
 				return;
 			}
 			
@@ -214,7 +414,7 @@ function updateState(state){
 		for(j in si ){
 			if( si[j] != lsi[j] ){
 				lsi[j]= si[j];
-				if( i==="watchify" ) updateWatchifyState(j,si[j] );
+				if( i==="watchify" ) updateWatchifyState(projectPage[j],si[j] );
 			}
 		}
 	}
@@ -226,23 +426,40 @@ function updateState(state){
 		for(j in lsi ){
 			if( lsi[j] != si[j] ){
 				lsi[j]= si[j];
-				if( i==="watchify" ) updateWatchifyState(j,si[j] );
+				if( i==="watchify" ) updateWatchifyState(projectPage[j],si[j] );
 			}
 		}
 	}
+	
+	//update seleted
+	if( lastSelected ){
+		var prj= getProjectInfo(lastSelected);
+
+		_ele("chkWatchify").checked= (lastState["watchify"] && lastState["watchify"][prj.pagePath]) ? true: false;
+	}
+
 }
 
-function updateWatchifyState( name, state ){
-	el= _ele('spCmdList').querySelector("span[name='"+name.replace(/\W/g,"-")+"']");
-	state? el.classList.add("state-watchify") : el.classList.remove("state-watchify");
-	if( el===lastSelected ){
-		_ele("chkWatchify").checked= state?true:false;
+function updateWatchifyState( nameSet, state ){
+	for( var name in nameSet ){
+		el= _ele('spCmdList').querySelector("span[name='"+safeString(name)+"']");
+		if( !el ){
+			var na= name.split("/*/");
+			if( na.length<2 ) return;
+			el= _ele('spLinkList').querySelector("span[name='"+na[0]+"/*/"+safeString(na[1])+"']");
+			if( !el ) return;
+		}
+		
+		state? el.classList.add("state-watchify") : el.classList.remove("state-watchify");
+		if( el===lastSelected ){
+			_ele("chkWatchify").checked= state?true:false;
+		}
 	}
 }
 
 function onClickWatchify(){
 	var chk= _ele("chkWatchify").checked;
-	sendHttpCmd( chk ? "startWatchify" : "stopWatchify" );
+	sendHttpCmd( chk ? "startWatchify" : "stopWatchify", "", true, function(err,data){ if(err) alert(err.error+","+err.responseText); } );
 }
 
 </script>

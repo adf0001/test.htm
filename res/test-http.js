@@ -9,6 +9,7 @@ var config = require("./test-http-config.js");
 var extension= ( typeof config.extension==="string" ) ? [config.extension] : ( config.extension || [] );
 extension= extension.map( v=>require( v ) );
 
+console.log("=".repeat(50));
 console.log("http://" + config.http_ip+":"+ config.http_port);
 console.log("root: " + __dirname );
 
