@@ -13,7 +13,6 @@ var test_http_config ={
 		"bat":"text/bat",
 		"txt":"text/plain",
 		"md":"text/x-markdown",
-		
 	},
 	
 	extension: "./test-http-extension.js",

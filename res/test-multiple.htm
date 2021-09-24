@@ -61,6 +61,11 @@
 				<label><input type=radio name="viewType" value='console' onclick="updateFrameView()"> console</label>
 				
 			}
+			<span>
+			{
+				<span class="ht-cmd" onclick="window.open(this.title,'_blank')" id='spEditPageFile'>VSCode</span>
+			}
+			</span>
 		</span>
 		<a style='float:right;color:blue;' href="about:blank;" target="_blank" id='addrLink' title='open in new window'>about:blank</a>
 	</div>
@@ -111,6 +116,35 @@ var _httpRequest= function( url, methodOrOptions, postData, cb, lastKey ){
 	
 	return xq;
 }
+
+function onPageChange(){
+	var url= _ele("ifPage").contentWindow.location.href;
+	_ele("addrLink").textContent= url;
+	_ele("addrLink").href= url;
+	
+	url= _ele("ifPage").contentWindow.location.pathname;
+	
+	//var ed= ( getRadioInputValue("viewType")=== "browse" && ! url.match(/[\\\/]$/) ) ? 1: 0;
+	var ed= ( getRadioInputValue("viewType")=== "browse" ) ? 1: 0;
+	
+	var el= _ele("spEditPageFile").parentNode;
+	if( ed && el.style.display=="none") el.style.display="";
+	else if( !ed && el.style.display!="none" ) el.style.display="none";
+	
+	if( ed ){
+		var mr= url.match( /^\/([^\/\*]+\/\*)\/(.*)$/ );
+		if( !mr ){
+			_ele("spEditPageFile").title="vscode://file/"+ root_dirpath + url;
+		}
+		else{
+			var link= mr[1], linkFilePath= mr[2];
+			linkFilePath= linkFilePath.replace(/(^|\/)\*\*\//g, "$1../");	//decode "../"
+			_ele("spEditPageFile").title="vscode://file/"+ normalizePath( root_dirpath + "/" + dirPart(projectData[link].link) + linkFilePath);
+		}
+	}
+}
+
+_ele("ifPage").onload= onPageChange;
 
 var lastSelected=null;
 
@@ -427,6 +461,8 @@ var tmidGetSpawnState=null;
 var stateErrorCount=0;
 var lastServerState="";
 
+var root_dirpath="";
+
 var lastSpawnStateXhr=null;
 
 function getSpawnState(){
@@ -456,6 +492,7 @@ function getSpawnState(){
 			updateState(state);
 			
 			if( !_ele('chkHttp').parentNode.title && state.dirname ){
+				root_dirpath= state.dirname;
 				_ele('chkHttp').parentNode.title= "file:///"+state.dirname.replace(/\\/g,"/")+"/test-multiple.htm";
 			}
 			
