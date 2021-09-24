@@ -350,7 +350,16 @@ function onBodyLoad(){
 		_ele('spLinkList').innerHTML= link.join("<br>");
 	}
 	
-	_ele('chkHttp').checked= false;
+	var isHttp= window.location.href.match(/^http/)?true:false;
+	_ele('chkHttp').checked= isHttp;
+	if( isHttp ){
+		getSpawnState();
+	}
+	else{
+		_ele('chkHttp').parentNode.title= "http://"+test_http_config.http_ip+":"+test_http_config.http_port+"/test-multiple.htm";
+	}
+	
+	updateFrameView();
 	
 	setHtmlPage("","8em",1);
 }
@@ -377,13 +386,16 @@ function updateFrameView(){
 
 function onClickHttp(){
 	var chk= _ele("chkHttp").checked;
-	updateFrameView();
 	
-	if( chk ) getSpawnState();
-	else{
-		if( lastSpawnStateXhr ) { lastSpawnStateXhr.abort(); lastSpawnStateXhr= null; }
+	_ele("chkHttp").checked= !chk;	//restore for browser history backward
+	
+	if( _ele('chkHttp').parentNode.title ){
+		try{ window.location= _ele('chkHttp').parentNode.title; } catch(ex){}	//ie11 throw exception
+		
+		if( ! chk ){
+			setTimeout( function(){ window.prompt("Copy the url, then paste as address in your browser.", _ele('chkHttp').parentNode.title ); }, 200 );
+		}
 	}
-	stateErrorCount=0;
 }
 
 function sendHttpCmd( cmd, data, addItemData,  cb ){
@@ -442,6 +454,11 @@ function getSpawnState(){
 			
 			var state= JSON.parse(lastServerState);
 			updateState(state);
+			
+			if( !_ele('chkHttp').parentNode.title && state.dirname ){
+				_ele('chkHttp').parentNode.title= "file:///"+state.dirname.replace(/\\/g,"/")+"/test-multiple.htm";
+			}
+			
 			stateErrorCount= 0;
 		}
 	);

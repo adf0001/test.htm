@@ -174,7 +174,7 @@ function getStateString(){
 	
 	//get new state string
 	
-	var state={},i,j,cacheItem,si,cnt;
+	var state={dirname:__dirname},i,j,cacheItem,si,cnt;
 	
 	for( i in spawnCache ){
 		cacheItem= spawnCache[i];
