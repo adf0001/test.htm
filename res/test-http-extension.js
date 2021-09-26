@@ -286,7 +286,7 @@ function loadLink( res, name ){
 	}
 }
 
-function loadLinkFile( res, linkPath ){
+function loadLinkFile( req, res, linkPath, default_process ){
 	var mr= linkPath.match( /^\/([^\/\*]+\/\*)\/(.*)$/ );
 	var link= mr[1], linkFilePath= mr[2]||"/";
 	
@@ -303,39 +303,16 @@ function loadLinkFile( res, linkPath ){
 	
 	console.log("link file, "+link+" : "+ path.dirname(projectData[link].link) + "/ " + linkFilePath );
 	//console.log(pathname);
+	//console.log(root);
 	
-	//directory
-	//if( pathname.slice(-1)==="/" ){
-	if( linkFilePath.slice(-1)==="/" ){
-		fs.readdir( pathname, {withFileTypes:true}, function(err,data) {
-			if( err ) { console.log(err); res.writeHead(500,{"Content-type":"text/plain;charset=UTF-8"}); res.end(""+err); return; }
-			var a= data.map(v=>{ var dirSlash=v.isDirectory() ? "/":""; return "<a href='"+ v.name+dirSlash+"'>"+ dirSlash + v.name + "</a>";});
-			res.writeHead(200,{"Content-type":"text/html;charset=UTF-8"});
-			res.end("<style>a{display:block;text-overflow:ellipsis;white-space:nowrap;overflow:hidden;text-decoration:none;}a:hover{text-decoration:underline;}</style><div style='column-width:10em;'>"+((pathname===root)?"":"<a href='../'>/..</a>")+a.join("")+"</div>");
-		});
-		return;
-	}
-	
-	//file
-	fs.readFile( pathname,function(err,data) {
-		if(err) {
-			if( err.code==="ENOENT" ) { res.writeHead(404,{"Content-type":"text/plain"}); res.end("404 NOT FOUND"); }
-			else{ console.log(err); res.writeHead(500,{"Content-type":"text/plain;charset=UTF-8"}); res.end(""+err); }
-			return;
-		};
-		
-		res.writeHead(200,{"Content-type":config.mime[path.extname(pathname).toLowerCase().slice(1)]||"application/octet-stream"});
-		res.end(data);
-	});
-	
-	
+	default_process( req, res, {pathname:pathname, isRoot:(pathname.replace(/[\\\/]+$/,"")==root), } );
 }
 
 //////////////////////////////////
 // http extension
 
 //if the request is processed, return true.
-module.exports = function(req,res){
+module.exports = function(req,res,options){
 	res.setHeader('Access-Control-Allow-Origin', "*" );
 	res.setHeader('Access-Control-Allow-Methods', "GET");
 	res.setHeader('Access-Control-Allow-Headers', "x-requested-with,content-type");
@@ -343,7 +320,7 @@ module.exports = function(req,res){
 	//link file
 	var reqUrl= url.parse(req.url,true);
 	if( reqUrl.pathname.match( /^\/[^\/\*]+\/\*\// ) ){
-		loadLinkFile(res,reqUrl.pathname);
+		loadLinkFile(req,res,reqUrl.pathname,options.default_process);
 		return true;
 	}
 	

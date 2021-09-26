@@ -5,6 +5,8 @@ var test_http_config ={
 	http_port: 8070,
 	
 	mime: {
+		"*":"text/plain",		//default mime type; internal default value will be "application/octet-stream" if not set;
+		
 		"html":"text/html",
 		"htm":"text/html",
 		"jpg":"image/jpg",
@@ -15,9 +17,12 @@ var test_http_config ={
 		"md":"text/x-markdown",
 	},
 	
-	extension: "./test-http-extension.js",
+	//head_text: "",				//head text for directory browsing
+	//default_process: "",			//default process module file name
 	
-	//extension_allow_link_ouside: true,
+	extension: "./test-http-extension.js",		//extension list
+	
+	//extension_allow_link_ouside: true,		//extension arg
 	
 };
 
