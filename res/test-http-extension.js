@@ -174,7 +174,7 @@ function getStateString(){
 	
 	//get new state string
 	
-	var state={dirname:__dirname},i,j,cacheItem,si,cnt;
+	var state={dirname:__dirname, server_file_exec:config.extension_server_file_exec },i,j,cacheItem,si,cnt;
 	
 	for( i in spawnCache ){
 		cacheItem= spawnCache[i];
@@ -286,26 +286,62 @@ function loadLink( res, name ){
 	}
 }
 
+//return [ relPath, link, root, fullPath ];
+function parseUrlPath( urlPath ){
+	var relPath, link, root, fullPath;
+	
+	var mr= urlPath.match( /^\/([^\/\*]+\/\*)\/(.*)$/ );
+	if( !mr ){
+		relPath= decodeURIComponent( urlPath );
+		link="";
+		root= __dirname;
+		fullPath= path.normalize( root+"/"+ relPath );
+	}
+	else {
+		link= mr[1];
+		if( !projectData[link] ) return Error( "link unfound, " + link );
+		
+		relPath= (mr[2]||"/").replace(/(^|\/)\*\*(?=\/|$)/g, "$1..");	//decode "../"
+		relPath= decodeURIComponent( relPath );
+		
+		root= path.dirname( path.normalize( __dirname+"/"+ projectData[link].link ));
+		
+		fullPath= path.normalize( root+"/"+ relPath );
+		if( ! config.extension_allow_ouside_link && fullPath.indexOf(root)!==0 )return Error( "outside link path, " + link );
+	}
+	
+	if( ! config.extension_allow_ouside_root && fullPath.indexOf(__dirname)!==0 )return Error( "outside root path" );
+	
+	return [ relPath, link, root, fullPath ];
+}
+
 function loadLinkFile( req, res, linkPath, default_process ){
-	var mr= linkPath.match( /^\/([^\/\*]+\/\*)\/(.*)$/ );
-	var link= mr[1], linkFilePath= mr[2]||"/";
+	var pp= parseUrlPath(linkPath);
+	if( pp instanceof Error ) { responseError( res, ""+pp ); return; }
 	
-	linkFilePath= linkFilePath.replace(/(^|\/)\*\*\//g, "$1../");	//decode "../"
+	var [ relPath, link, root, fullPath ]= pp;
+	console.log("link file, "+link+" : "+ relPath );
 	
-	if( !projectData[link] ){ responseError( res, "link unfound, " + link ); return; }
+	default_process( req, res, {pathname:fullPath, isRoot:(fullPath.replace(/[\\\/]+$/,"")==root), } );
+}
+
+function serverFileExec( res, exec, fileUrl ){
+	var execBin= config.extension_server_file_exec[exec];
+	if( ! execBin ) { responseError( res, "exec unfound, "+ exec ); return; }
 	
-	//file
-	console.log(__dirname+"/"+ projectData[link].link);
-	var root= path.dirname( path.normalize( __dirname+"/"+ projectData[link].link ));
+	var fileUrl= url.parse( decodeURIComponent(fileUrl) );
 	
-	var pathname = path.normalize( root + "/" + decodeURIComponent( linkFilePath ));
-	if( ! config.extension_allow_link_ouside && pathname.indexOf(root)!==0 ){ responseError( res, "outside link path, " + link ); return; }
+	var pp= parseUrlPath(fileUrl.pathname);
+	if( pp instanceof Error ) { responseError( res, ""+pp ); return; }
 	
-	console.log("link file, "+link+" : "+ path.dirname(projectData[link].link) + "/ " + linkFilePath );
-	//console.log(pathname);
-	//console.log(root);
+	var [ relPath, link, root, fullPath ]= pp;
+	console.log("exec, "+exec+" : "+ fullPath );
 	
-	default_process( req, res, {pathname:pathname, isRoot:(pathname.replace(/[\\\/]+$/,"")==root), } );
+	var sCmd= "start \"\" " + execBin + " \"" + fullPath+ "\"";
+	console.log( sCmd );
+	child_process.exec( sCmd, (err)=>{ if( err ) console.log(err); } );
+	
+	responseOk( res, "try it" );
 }
 
 //////////////////////////////////
@@ -346,18 +382,23 @@ module.exports = function(req,res,options){
 		loadLink(res,query["name"]);
 		return true;
 	}
+	else if( cmd==="serverFileExec" ){
+		console.log( "cmd=" + cmd+", "+ reqUrl.search );
+		serverFileExec( res, query["exec"], decodeURIComponent(query["file"]) );
+		return true;
+	}
 	
 	//item cmd
 	
 	var name= query["name"];
 	//console.log(name);
-	if(!name ) return;
+	if(!name )  { responseError( res, "empty name" ); return true; }
 	
 	var link= linkFromName( name );
 	
 	var item= projectData[name];
 	//console.log(item);
-	if( ! item ) return;
+	if( ! item ) { responseError( res, "empty item" ); return true; }
 	
 	console.log( "cmd=" + cmd + ", name=" + name + ", link=" + link );
 	
@@ -374,7 +415,10 @@ module.exports = function(req,res,options){
 		}
 		else responseOk( res, cmd );
 	}
-	else return;
+	else{
+		responseError( res, "unknown cmd, " + cmd );
+		return true;
+	}
 	
 	return true;
 }

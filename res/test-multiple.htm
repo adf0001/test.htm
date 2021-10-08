@@ -63,8 +63,15 @@
 			}
 			<span>
 			{
-				<span class="ht-cmd" onclick="window.open(this.title,'_blank')" id='spEditPageFile'>VSCode</span>
+				<span class="ht-cmd" onclick="window.open(this.title,'_blank')" id='spVscode'>VSCode</span>
 			}
+			<span id="spFileTool">
+			{
+				<span class='ht-cmd' title='go back' onclick="history.go(-1);">＜</span>
+				<span id="spFileExec">
+				</span>
+			}
+			</span>
 			</span>
 		</span>
 		<a style='float:right;color:blue;' href="about:blank;" target="_blank" id='addrLink' title='open in new window'>about:blank</a>
@@ -117,6 +124,18 @@ var _httpRequest= function( url, methodOrOptions, postData, cb, lastKey ){
 	return xq;
 }
 
+function serverFileExec(el){
+	var exec= el.textContent;
+	
+	sendHttpCmd( "serverFileExec", "exec="+exec+"&file="+encodeURIComponent( _ele("ifPage").contentWindow.location.href ), true,
+		function(err, data){
+			console.log(err);
+			console.log(data);
+		}
+	);
+
+}
+
 function onPageChange(){
 	var url= _ele("ifPage").contentWindow.location.href;
 	_ele("addrLink").textContent= url;
@@ -124,24 +143,37 @@ function onPageChange(){
 	
 	url= _ele("ifPage").contentWindow.location.pathname;
 	
-	//var ed= ( getRadioInputValue("viewType")=== "browse" && ! url.match(/[\\\/]$/) ) ? 1: 0;
-	var ed= ( getRadioInputValue("viewType")=== "browse" ) ? 1: 0;
+	//var edVscode= ( getRadioInputValue("viewType")=== "browse" && ! url.match(/[\\\/]$/) ) ? 1: 0;
+	var edVscode= ( getRadioInputValue("viewType")=== "browse" ) ? 1: 0;
+	var isFileExec= edVscode && ! url.match(/[\\\/]$/);
 	
-	var el= _ele("spEditPageFile").parentNode;
-	if( ed && el.style.display=="none") el.style.display="";
-	else if( !ed && el.style.display!="none" ) el.style.display="none";
+	var el= _ele("spVscode").parentNode;
+	if( edVscode && el.style.display=="none") el.style.display="";
+	else if( !edVscode && el.style.display!="none" ) el.style.display="none";
 	
-	if( ed ){
-		var mr= url.match( /^\/([^\/\*]+\/\*)\/(.*)$/ );
+	if( edVscode ){
+		var mr= url.match( /^\/([^\/\*]+\/\*)\/(.*)$/ ), fpath="";
 		if( !mr ){
-			_ele("spEditPageFile").title="vscode://file/"+ root_dirpath + url;
+			fpath= root_dirpath + url;
 		}
 		else{
 			var link= mr[1], linkFilePath= mr[2];
 			linkFilePath= linkFilePath.replace(/(^|\/)\*\*\//g, "$1../");	//decode "../"
-			_ele("spEditPageFile").title="vscode://file/"+ normalizePath( root_dirpath + "/" + dirPart(projectData[link].link) + linkFilePath);
+			fpath= normalizePath( root_dirpath + "/" + dirPart(projectData[link].link) + linkFilePath);
+		}
+		_ele("spVscode").title="vscode://file/"+ fpath;
+		
+		if( isFileExec ){
+			var nds= _ele("spFileExec").childNodes,nd,i;
+			for(i=0;i<nds.length;i++){
+				nd= nds[i];
+				if( nd.className!="ht-cmd" ) continue;
+				nd.title= nd.title.split("\n")[0].replace( /\s+$/, "" ) + "\nfile: " + fpath ;
+			}
 		}
 	}
+	
+	_ele("spFileTool").style.display= isFileExec?"":"none";
 }
 
 _ele("ifPage").onload= onPageChange;
@@ -463,6 +495,8 @@ var lastServerState="";
 
 var root_dirpath="";
 
+var server_file_exec=null;
+
 var lastSpawnStateXhr=null;
 
 function getSpawnState(){
@@ -494,6 +528,15 @@ function getSpawnState(){
 			if( !_ele('chkHttp').parentNode.title && state.dirname ){
 				root_dirpath= state.dirname;
 				_ele('chkHttp').parentNode.title= "file:///"+state.dirname.replace(/\\/g,"/")+"/test-multiple.htm";
+			}
+			
+			if( !server_file_exec && state.server_file_exec ){
+				server_file_exec= state.server_file_exec;
+				var el= _ele('spFileExec'), a=[];
+				for(var i in  server_file_exec ){
+					a[a.length]= " <span class='ht-cmd' title='open by ["+server_file_exec[i]+"]' onclick='serverFileExec(this)'>"+i+"</span> ";
+				}
+				el.innerHTML= a.length? (" | "+a.join(" | ")+" "):"";
 			}
 			
 			stateErrorCount= 0;

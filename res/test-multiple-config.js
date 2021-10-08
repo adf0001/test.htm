@@ -4,7 +4,7 @@ var test_multiple_config={
 	
 	"Sample": "../test/test.htm",
 	
-	"module": "../../test-multiple-config.js",
+	"module": "../../test-multiple-config.js",		//link another multiple config
 	
 	//__NEW_INSERTION_HERE__	//don't remove or change this line if you need insertion by program
 };

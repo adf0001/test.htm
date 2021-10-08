@@ -116,7 +116,7 @@ async function mainAsync(){
 	inp= await consolePrompt('* Copy tools for http, to parent folder? y/n (n):');
 	if( inp=="y" ){
 		await copyReplacedFile( "res/test-http.js", [], false, "../test-http.js" );
-		await copyReplacedFile( "res/test-http-config.js", [], true, "../test-http-config.js" );
+		await copyReplacedFile( "res/test-http-config.js", ["extension_allow_ouside_link:","//extension_allow_ouside_link:","extension_allow_ouside_root:","//extension_allow_ouside_root:","extension_server_file_exec:","//extension_server_file_exec:"], true, "../test-http-config.js" );
 		await copyReplacedFile( "res/test-http-extension.js", [], false, "../test-http-extension.js" );
 		await copyReplacedFile( "res/test-http.bat", [], false, "../test-http.bat" );
 	}
