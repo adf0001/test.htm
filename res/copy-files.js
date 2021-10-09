@@ -51,30 +51,52 @@ async function consolePrompt( questionText ){
 /////////////////////////////////
 // copy file
 
+var _dateString23= function (dt) {
+	if( !dt ) dt= new Date();
+	
+	var s = dt.getFullYear() + "-" + (dt.getMonth() + 1) + "-" + dt.getDate() +
+		" " + dt.getHours() + ":" + dt.getMinutes() + ":" + dt.getSeconds();
+	return s.replace(/\b(\d)\b/g, "0$1")+"."+("00"+dt.getMilliseconds()).slice(-3);
+}
+
+var bakFileTail= function () {
+	return "-" + _dateString23().replace( /[\-\:]/g,"").replace( " ", "-" );
+}
+
 async function copyReplacedFile( fname, replacePairArray, protectUserFile, destFname ){
 	
 	if( ! destFname ) destFname= fname;
 	
+	var sNew= fs.readFileSync( srcDir+fname, 'utf-8' );
+	//console.log(sNew);
+	for(var i=0;i<replacePairArray.length;i+=2){
+		sNew=sNew.replace( replacePairArray[i], replacePairArray[i+1] );
+	}
+	
 	if( fs.existsSync( destDir + destFname ) ){
+		var sOld= fs.readFileSync( destDir+destFname, 'utf-8' );
+		if( sNew==sOld ){
+			console.warn( destFname + " ........................ skip identical !!!" );
+			return false;
+		}
+		
 		if( protectUserFile ){
 			console.warn( destFname + " ........................ skip protected !!!" );
 			return false;
 		}
 		
-		var inp= await consolePrompt( "File '" + destFname+"' is already existed, replaced it ? y/n (n):");
+		var inp= await consolePrompt( "File '" + destFname+"' is already existed, to backup and replace it ? y/n (n):");
 		
 		if( inp!="y" ){
 			console.warn( destFname + " ........................ skip existed !!!" );
 			return false;
 		}
+		
+		
+		fs.copyFileSync( destDir + destFname, destDir + destFname.replace( /(\.[^\.]+)$/, bakFileTail()+"$1") );
 	}
 	
-	var s= fs.readFileSync( srcDir+fname, 'utf-8' );
-	//console.log(s);
-	for(var i=0;i<replacePairArray.length;i+=2){
-		s=s.replace( replacePairArray[i], replacePairArray[i+1] );
-	}
-	fs.writeFileSync( destDir+destFname, s );
+	fs.writeFileSync( destDir+destFname, sNew );
 	console.log( destFname + " ...... copied" );
 	return true;
 }
@@ -127,8 +149,7 @@ async function mainAsync(){
 		if( aListText.length==2 ){		//check format
 			inp= await consolePrompt('* Append project link \"'+name+'\" to ../test-multiple-config.js ? y/n (n):');
 			if( inp=="y" ){
-				if( ! aListText[0].match(/[\,\{]\s*$/) ) aListText[0]= aListText[0]+",\n\t";
-				aListText[0]+="\""+ name + "\": \"" + destDirLast+"/test/test.htm\",\n\t";
+				aListText[0]=aListText[0].replace(/\s+$/,"") + "\n\t\""+ name + "\": \"" + destDirLast+"/test/test.htm\",\n\n\t";
 				
 				fs.writeFileSync( destDir+"../test-multiple-config.js", aListText.join("//__NEW_INSERTION_HERE__") );
 				
