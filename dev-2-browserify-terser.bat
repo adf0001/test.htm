@@ -10,6 +10,7 @@ set module=sample
 if not exist ./release md release
 
 call %browserifyPath% -p %bundleCollapserPath% -o ./release/bundle.min.js -v ^
+	-t [ %globalModulePath%/stringify --extensions [.html .css .htm ] --minify true ] ^
 	-r ./%module%.js:%module%
 
 echo on
